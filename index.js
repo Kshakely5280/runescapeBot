@@ -9,7 +9,7 @@ function main() {
 
   // Distance between each Maple Log (adjust based on your game)
   const baseLogDistanceX = 42;
-  const baseLogDistanceY = 38;
+  const baseLogDistanceY = 37;
 
   const variationRange = 2;
 
@@ -18,7 +18,7 @@ function main() {
   const numberOfRows = 7;
 
   // Set the mouse speed (0 is slowest, 10 is fastest)
-  robot.setMouseDelay(1);
+  robot.setMouseDelay(3);
 
   for (let row = 0; row < numberOfRows; row++) {
     for (let col = 0; col < logsInRow; col++) {
@@ -34,16 +34,24 @@ function main() {
       // Click Tinderbox
       robot.moveMouseSmooth(tinderboxCoordinates.x, tinderboxCoordinates.y);
       robot.mouseClick();
-
-      // Sleep for a random short duration
-      sleepRandom(200, 500);
+     
+      // Sleep for a longer duration for iterations 1-8
+      if (row * logsInRow + col < 8) {
+        sleepRandom(1800, 2200);
+      } else if (row * logsInRow + col < 18) {
+        // Sleep for a normal duration for iterations 9-18
+        sleepRandom(450, 650);
+      } else {
+        // Sleep for a very small duration for iterations 19-27
+        sleepRandom(50, 150);
+      }
 
       // Click the current Maple Log
       robot.moveMouseSmooth(currentLogCoordinates.x, currentLogCoordinates.y);
       robot.mouseClick();
 
       // Sleep for a random short duration before the next iteration
-      sleepRandom(500, 1000);
+      sleepRandom(100, 300);
     }
   }
 
