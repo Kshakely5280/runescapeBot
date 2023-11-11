@@ -20,8 +20,13 @@ function main() {
   // Set the mouse speed (0 is slowest, 10 is fastest)
   robot.setMouseDelay(3);
 
+
   for (let row = 0; row < numberOfRows; row++) {
     for (let col = 0; col < logsInRow; col++) {
+      // Skip the first log on the first row
+      if (row === 0 && col === 0) {
+        continue;
+      }
       // Calculate coordinates for the current Maple Log relative to the inventory origin
       const randomOffsetX = getRandomOffset(variationRange);
       const randomOffsetY = getRandomOffset(variationRange);
