@@ -4,16 +4,16 @@ function main() {
   console.log("Starting...");
 
   // Coordinates for the Tinderbox and the first Maple Log
-  const tinderboxCoordinates = { x: 1000, y: 800 };
+  const tinderboxCoordinates = { x: 1000, y: 800 }; // adjust based on your client location
   const inventoryOrigin = { x: 990, y: 800 }; // Top-left corner of the inventory
 
   // Distance between each Maple Log (adjust based on your game)
-  const logDistanceX = 42; // Example distance
-  const logDistanceY = 38; // Example distance
+  const logDistanceX = 42; 
+  const logDistanceY = 38; 
 
   // Number of Maple Logs in each row and the number of rows
-  const logsInRow = 4; // Adjust based on your game
-  const numberOfRows = 7; // Adjust based on your game
+  const logsInRow = 4; 
+  const numberOfRows = 7; 
 
   for (let row = 0; row < numberOfRows; row++) {
     for (let col = 0; col < logsInRow; col++) {
@@ -28,7 +28,7 @@ function main() {
       robot.mouseClick();
 
       // Sleep for a random short duration
-      sleepRandom(500, 1000);
+      sleepRandom(200, 1000);
 
       // Click the current Maple Log
       robot.moveMouseSmooth(currentLogCoordinates.x, currentLogCoordinates.y);
