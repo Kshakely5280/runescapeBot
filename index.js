@@ -8,19 +8,27 @@ function main() {
   const inventoryOrigin = { x: 990, y: 800 }; // Top-left corner of the inventory
 
   // Distance between each Maple Log (adjust based on your game)
-  const logDistanceX = 42; 
-  const logDistanceY = 38; 
+  const baseLogDistanceX = 42;
+  const baseLogDistanceY = 38;
+
+  const variationRange = 2;
 
   // Number of Maple Logs in each row and the number of rows
-  const logsInRow = 4; 
-  const numberOfRows = 7; 
+  const logsInRow = 4;
+  const numberOfRows = 7;
+
+  // Set the mouse speed (0 is slowest, 10 is fastest)
+  robot.setMouseDelay(1);
 
   for (let row = 0; row < numberOfRows; row++) {
     for (let col = 0; col < logsInRow; col++) {
       // Calculate coordinates for the current Maple Log relative to the inventory origin
+      const randomOffsetX = getRandomOffset(variationRange);
+      const randomOffsetY = getRandomOffset(variationRange);
+
       const currentLogCoordinates = {
-        x: inventoryOrigin.x + col * logDistanceX,
-        y: inventoryOrigin.y + row * logDistanceY,
+        x: inventoryOrigin.x + col * (baseLogDistanceX + randomOffsetX),
+        y: inventoryOrigin.y + row * (baseLogDistanceY + randomOffsetY),
       };
 
       // Click Tinderbox
@@ -28,18 +36,22 @@ function main() {
       robot.mouseClick();
 
       // Sleep for a random short duration
-      sleepRandom(200, 1000);
+      sleepRandom(200, 500);
 
       // Click the current Maple Log
       robot.moveMouseSmooth(currentLogCoordinates.x, currentLogCoordinates.y);
       robot.mouseClick();
 
       // Sleep for a random short duration before the next iteration
-      sleepRandom(1000, 2000);
+      sleepRandom(500, 1000);
     }
   }
 
   console.log("Script completed.");
+}
+
+function getRandomOffset(range) {
+  return Math.floor(Math.random() * (2 * range + 1)) - range;
 }
 
 function sleep(ms) {
