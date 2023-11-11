@@ -1,115 +1,54 @@
 const robot = require("robotjs");
-const keypress = require("keypress");
-
-keypress(process.stdin);
-
-let isRunning = true;
-
-process.stdin.on("keypress", function (ch, key) {
-  if (key && key.ctrl && key.name === "c") {
-    isRunning = false;
-    process.exit();
-  }
-});
-
-process.stdin.setRawMode(true);
-process.stdin.resume();
-
-function findMapleLogs() {
-  const inventoryX = 950; // Adjust these coordinates based on your game window
-  const inventoryY = 800;
-  const inventoryWidth = 200; // Adjust this based on your inventory size
-  const inventoryHeight = 300;
-
-  for (let x = inventoryX; x < inventoryX + inventoryWidth; x += 10) {
-    for (let y = inventoryY; y < inventoryY + inventoryHeight; y += 10) {
-      robot.moveMouse(x, y);
-
-      const screen = robot.screen.capture(
-        inventoryX,
-        inventoryY,
-        inventoryWidth,
-        inventoryHeight
-      );
-
-      const mapleLogsColor = [255, 180, 40];
-      const currentPixelColor = screen.colorAt(x - inventoryX, y - inventoryY);
-
-      const colorThreshold = 10;
-      if (
-        Math.abs(currentPixelColor.r - mapleLogsColor[0]) < colorThreshold &&
-        Math.abs(currentPixelColor.g - mapleLogsColor[1]) < colorThreshold &&
-        Math.abs(currentPixelColor.b - mapleLogsColor[2]) < colorThreshold
-      ) {
-        return { x: x, y: y };
-      }
-    }
-  }
-
-  return null;
-}
-
-function checkActionAvailable() {
-  // You need to capture the screen content and check for the "Use Tinderbox on Maple logs" text or image
-  // Implement this part based on your game's UI and appearance
-  // You might need to use a library like Tesseract.js or another OCR (Optical Character Recognition) tool
-  // Here's a simplified example (doesn't actually perform OCR):
-
-  const screen = robot.screen.capture();
-  const actionTextCoordinates = screen.findBitmap("use_tinderbox_on_maple_logs.png");
-
-  return actionTextCoordinates !== null;
-}
 
 function main() {
   console.log("Starting...");
-  sleepRandom(4000, 5000);
 
-  const tinderboxSlot = { x: 1000, y: 800 };
+  // Coordinates for the Tinderbox and the first Maple Log
+  const tinderboxCoordinates = { x: 1000, y: 800 };
+  const inventoryOrigin = { x: 990, y: 800 }; // Top-left corner of the inventory
 
-  while (isRunning) {
-    // Click Tinderbox
-    robot.moveMouse(tinderboxSlot.x, tinderboxSlot.y);
-    sleepRandom(100, 300);
-    robot.mouseClick();
+  // Distance between each Maple Log (adjust based on your game)
+  const logDistanceX = 42; // Example distance
+  const logDistanceY = 38; // Example distance
 
-    sleepRandom(1500, 2500);
+  // Number of Maple Logs in each row and the number of rows
+  const logsInRow = 4; // Adjust based on your game
+  const numberOfRows = 7; // Adjust based on your game
 
-    // Hover over inventory until "Use Tinderbox on Maple logs" is available
-    while (!checkActionAvailable() && isRunning) {
-      sleep(500);
-    }
+  for (let row = 0; row < numberOfRows; row++) {
+    for (let col = 0; col < logsInRow; col++) {
+      // Calculate coordinates for the current Maple Log relative to the inventory origin
+      const currentLogCoordinates = {
+        x: inventoryOrigin.x + col * logDistanceX,
+        y: inventoryOrigin.y + row * logDistanceY,
+      };
 
-    if (isRunning) {
-      // Click Maple Logs
-      const logsSlot = findMapleLogs();
-      if (logsSlot) {
-        robot.moveMouse(logsSlot.x, logsSlot.y);
-        sleepRandom(100, 200);
-        robot.mouseClick();
-      } else {
-        console.log("Maple Logs not found");
-      }
-
-      // Click Tinderbox again
-      robot.moveMouse(tinderboxSlot.x, tinderboxSlot.y);
-      sleepRandom(100, 300);
+      // Click Tinderbox
+      robot.moveMouseSmooth(tinderboxCoordinates.x, tinderboxCoordinates.y);
       robot.mouseClick();
 
-      sleepRandom(8000, 10000);
+      // Sleep for a random short duration
+      sleepRandom(500, 1000);
+
+      // Click the current Maple Log
+      robot.moveMouseSmooth(currentLogCoordinates.x, currentLogCoordinates.y);
+      robot.mouseClick();
+
+      // Sleep for a random short duration before the next iteration
+      sleepRandom(1000, 2000);
     }
   }
 
-  console.log("Script stopped.");
-}
-
-function sleepRandom(min, max) {
-  const randomDuration = Math.random() * (max - min) + min;
-  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, randomDuration);
+  console.log("Script completed.");
 }
 
 function sleep(ms) {
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+}
+
+function sleepRandom(min, max) {
+  const randomDuration = Math.random() * (max - min) + min;
+  sleep(randomDuration);
 }
 
 main();
